@@ -6,7 +6,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chrome.google.com/webstore)
-[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/trueai-org/element-eraser)
+[![Version](https://img.shields.io/badge/version-2.0.1-orange.svg)](https://github.com/trueai-org/element-eraser)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/trueai-org/element-eraser/pulls)
 
 一键删除网页上的任何元素 - 广告、弹窗、推荐内容，让网页更清爽！
