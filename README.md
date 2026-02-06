@@ -9,8 +9,6 @@
 [![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/trueai-org/element-eraser)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/trueai-org/element-eraser/pulls)
 
-**[English](#english) | [中文文档](#chinese)**
-
 一键删除网页上的任何元素 - 广告、弹窗、推荐内容，让网页更清爽！
 
 *One-click removal of any web elements - ads, pop-ups, recommendations, for a cleaner web!*
@@ -139,7 +137,7 @@
 
 ---
 
-## 📸 截图 {#screenshots}
+## 📸 截图
 
 ### 主界面
 ![主界面](screenshots/popup.png)
