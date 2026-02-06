@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Element Eraser - 使用教程</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f8f9fa;
+        line-height: 1.6;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .header h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 18px;
+        opacity: 0.9;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .card h2 {
+        color: #667eea;
+        font-size: 28px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card h3 {
+        color: #495057;
+        font-size: 20px;
+        margin: 24px 0 12px 0;
+        padding-left: 12px;
+        border-left: 4px solid #667eea;
+      }
+
+      .card p {
+        color: #495057;
+        margin-bottom: 16px;
+        font-size: 15px;
+      }
+
+      .method-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .method-tab {
+        padding: 12px 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #868e96;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.3s;
+      }
+
+      .method-tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+      }
+
+      .method-tab:hover {
+        color: #667eea;
+      }
+
+      .method-content {
+        display: none;
+      }
+
+      .method-content.active {
+        display: block;
+      }
+
+      .example-box {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        margin: 16px 0;
+        border-radius: 4px;
+      }
+
+      .example-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 12px;
+        font-size: 16px;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 14px;
+        overflow-x: auto;
+        margin: 12px 0;
+      }
+
+      .code-inline {
+        background: #e9ecef;
+        color: #e83e8c;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 14px;
+      }
+
+      .step-list {
+        counter-reset: step-counter;
+        list-style: none;
+        padding: 0;
+      }
+
+      .step-list li {
+        counter-increment: step-counter;
+        margin-bottom: 20px;
+        padding-left: 50px;
+        position: relative;
+      }
+
+      .step-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 35px;
+        height: 35px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .tip-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+      }
+
+      .tip-box strong {
+        color: #856404;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .tip-box p {
+        color: #856404;
+        margin: 0;
+      }
+
+      .info-box {
+        background: #d1ecf1;
+        border-left: 4px solid #17a2b8;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+      }
+
+      .info-box strong {
+        color: #0c5460;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .info-box p {
+        color: #0c5460;
+        margin: 0;
+      }
+
+      .screenshot {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+      }
+
+      .resources {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .resource-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s;
+        border: 2px solid #e9ecef;
+      }
+
+      .resource-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        transform: translateY(-3px);
+      }
+
+      .resource-card h4 {
+        color: #667eea;
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .resource-card p {
+        color: #868e96;
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .comparison-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+      }
+
+      .comparison-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      .visual-guide {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .visual-item {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .visual-item img {
+        max-width: 100%;
+        border-radius: 4px;
+        margin-bottom: 12px;
+      }
+
+      .visual-item p {
+        font-size: 14px;
+        color: #495057;
+        margin: 0;
+      }
+
+      @media (max-width: 768px) {
+        .visual-guide {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .back-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-bottom: 20px;
+      }
+
+      .back-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>📖 Element Eraser 使用教程</h1>
+      <p>5分钟学会如何删除网页上的任何元素</p>
+    </div>
+
+    <div class="container">
+      <!-- <a href="popup.html" class="back-btn">← 返回主页</a> -->
+
+      <!-- 快速开始 -->
+      <div class="card">
+        <h2>🚀 快速开始（推荐新手）</h2>
+        <p>最简单的方法：<strong>不需要懂 CSS 或 XPath！</strong></p>
+
+        <ol class="step-list">
+          <li>
+            <strong>点击插件图标</strong><br />
+            在浏览器工具栏找到 Element Eraser 图标并点击
+          </li>
+          <li>
+            <strong>点击"开始选择元素"按钮</strong><br />
+            使用默认设置即可（CSS + 隐藏模式）
+          </li>
+          <li>
+            <strong>鼠标移动到要删除的内容上</strong><br />
+            例如广告、弹窗、推荐内容等，会出现红色边框
+          </li>
+          <li>
+            <strong>点击一下</strong><br />
+            元素立即消失！规则自动保存
+          </li>
+          <li>
+            <strong>按 ESC 键退出</strong><br />
+            完成操作
+          </li>
+        </ol>
+
+        <div class="tip-box">
+          <strong>💡 小提示</strong>
+          <p>刷新页面后，被删除的内容依然不会出现！插件会自动记住你的选择。</p>
+        </div>
+      </div>
+
+      <!-- 选择器类型对比 -->
+      <div class="card">
+        <h2>🎯 理解两种选择器类型</h2>
+
+        <div class="method-tabs">
+          <button class="method-tab active">CSS 选择器</button>
+        </div>
+
+        <!-- CSS 选择器 -->
+        <div id="css-content" class="method-content active">
+          <h3>什么是 CSS 选择器？</h3>
+          <p>
+            CSS
+            选择器就像"地址"，告诉浏览器要找哪个元素。就像你告诉快递员"3号楼2单元501"一样简单。
+          </p>
+
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>选择器</th>
+                <th>含义</th>
+                <th>举例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="code-inline">#id名称</code></td>
+                <td>通过 ID 查找（最精确）</td>
+                <td>
+                  <code class="code-inline">#ad-banner</code> 找到 ID 为
+                  "ad-banner" 的元素
+                </td>
+              </tr>
+              <tr>
+                <td><code class="code-inline">.类名</code></td>
+                <td>通过 class 查找</td>
+                <td>
+                  <code class="code-inline">.advertisement</code> 找到所有广告
+                </td>
+              </tr>
+              <tr>
+                <td><code class="code-inline">标签名</code></td>
+                <td>通过 HTML 标签查找</td>
+                <td><code class="code-inline">iframe</code> 找到所有 iframe</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="example-box">
+            <div class="example-title">🌰 常见广告 CSS 选择器示例</div>
+            <div class="code-block">
+              #ad-container .adsbygoogle .advertisement [data-ad="true"]
+              iframe[src*="doubleclick"]
+            </div>
+          </div>
+
+          <div class="info-box">
+            <strong>✅ 推荐使用场景</strong>
+            <p>
+              • 删除广告和弹窗（90%的情况）<br />
+              • 速度快，简单直观<br />
+              • 适合新手
+            </p>
+          </div>
+        </div>
+
+        <div class="method-tabs">
+          <button class="method-tab active">XPath 表达式</button>
+        </div>
+
+        <!-- XPath 表达式 -->
+        <div id="xpath-content" class="method-content active">
+          <h3>什么是 XPath？</h3>
+          <p>
+            XPath 像是"导航路线"，可以描述更复杂的查找方式。如果 CSS
+            找不到，可以用 XPath。
+          </p>
+
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>表达式</th>
+                <th>含义</th>
+                <th>举例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="code-inline">//*[@id="xxx"]</code></td>
+                <td>查找 ID 为 xxx 的元素</td>
+                <td><code class="code-inline">//*[@id="aswift_0"]</code></td>
+              </tr>
+              <tr>
+                <td><code class="code-inline">//div[@class="xxx"]</code></td>
+                <td>查找 class 为 xxx 的 div</td>
+                <td><code class="code-inline">//div[@class="ad"]</code></td>
+              </tr>
+              <tr>
+                <td>
+                  <code class="code-inline">//*[contains(@id, "ad")]</code>
+                </td>
+                <td>查找 ID 包含 "ad" 的元素</td>
+                <td>
+                  <code class="code-inline">//*[contains(@id, "google")]</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="example-box">
+            <div class="example-title">🌰 常见广告 XPath 示例</div>
+            <div class="code-block">
+              //*[@id="aswift_3_host"] //iframe[contains(@src, "ads")]
+              //div[contains(@class, "advertisement")] //*[@data-ad-slot]
+            </div>
+          </div>
+
+          <div class="info-box">
+            <strong>✅ 推荐使用场景</strong>
+            <p>
+              • CSS 选择器找不到元素时<br />
+              • 需要更复杂的查找条件<br />
+              • 动态生成的广告
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 如何获取选择器 -->
+      <div class="card">
+        <h2>🔍 如何获取元素的选择器？</h2>
+
+        <h3>方法一：使用浏览器开发者工具（推荐）</h3>
+        <ol class="step-list">
+          <li>
+            <strong>右键点击要删除的元素</strong><br />
+            选择"检查"或"审查元素"
+          </li>
+          <li>
+            <strong>在开发者工具中找到高亮的代码</strong><br />
+            这就是该元素的 HTML 代码
+          </li>
+          <li>
+            <strong>右键点击高亮代码</strong><br />
+            选择 "Copy" → "Copy selector" 获取 CSS 选择器<br />
+            或选择 "Copy XPath" 获取 XPath
+          </li>
+          <li>
+            <strong>粘贴到插件的手动输入框</strong><br />
+            点击"添加规则"即可
+          </li>
+        </ol>
+
+        <div class="tip-box">
+          <strong>💡 快捷键</strong>
+          <p>
+            • Windows/Linux: 按 F12 打开开发者工具<br />
+            • Mac: 按 Cmd + Option + I
+          </p>
+        </div>
+
+        <h3>方法二：使用插件自动生成（最简单）</h3>
+        <p>直接点击"开始选择元素"，插件会自动生成最佳选择器，无需手动操作！</p>
+      </div>
+
+      <!-- 常见问题 -->
+      <div class="card">
+        <h2>❓ 常见问题解答</h2>
+
+        <h3>Q1: CSS 和 XPath 应该选哪个？</h3>
+        <p>
+          <strong>A:</strong> 新手建议用 <strong>CSS 选择器</strong>，90%
+          的情况都够用。只有 CSS 找不到时才用 XPath。
+        </p>
+
+        <h3>Q2: "隐藏"和"删除"有什么区别？</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+          <li><strong>隐藏</strong>：元素还在，只是看不见（推荐）</li>
+          <li><strong>删除</strong>：直接从网页代码中移除（用于顽固广告）</li>
+        </ul>
+
+        <h3>Q3: 为什么有时候删除不生效？</h3>
+        <p><strong>A:</strong> 可能是广告延迟加载。解决方法：</p>
+        <ul>
+          <li>等广告完全显示后再删除</li>
+          <li>使用"删除模式"而不是"隐藏模��"</li>
+          <li>刷新页面测试是否生效</li>
+        </ul>
+
+        <h3>Q4: 如何删除 Google Ads？</h3>
+        <p><strong>A:</strong> 常见的 Google Ads 选择器：</p>
+        <div class="code-block">
+          #aswift_0_host #aswift_1_host .adsbygoogle ins.adsbygoogle
+        </div>
+      </div>
+
+      <!-- 实战案例 -->
+      <div class="card">
+        <h2>💼 实战案例</h2>
+
+        <div class="example-box">
+          <div class="example-title">案例1: 删除百度广告</div>
+          <p><strong>CSS 选择器：</strong></p>
+          <div class="code-block">#content_right .result-op</div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-title">案例2: 删除 YouTube 广告</div>
+          <p><strong>CSS 选择器：</strong></p>
+          <div class="code-block">.video-ads .ytp-ad-module</div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-title">案例3: 删除弹窗</div>
+          <p><strong>CSS 选择器：</strong></p>
+          <div class="code-block">.modal .popup .overlay</div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-title">案例4: 删除页面推荐</div>
+          <p><strong>CSS 选择器：</strong></p>
+          <div class="code-block">
+            #recommend .recommend-box [data-recommend]
+          </div>
+        </div>
+      </div>
+
+      <!-- 学习资源 -->
+      <div class="card">
+        <h2>📚 进阶学习资源</h2>
+        <p>想深入学习？推荐以下资源：</p>
+
+        <div class="resources">
+          <a
+            href="https://www.w3school.com.cn/css/css_selector_intro.asp"
+            target="_blank"
+            class="resource-card"
+          >
+            <h4>🎓 W3School CSS 教程</h4>
+            <p>中文免费教程，适合零基础</p>
+          </a>
+
+          <a
+            href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Selectors"
+            target="_blank"
+            class="resource-card"
+          >
+            <h4>📖 MDN CSS 选择器</h4>
+            <p>权威文档，深入学习</p>
+          </a>
+
+          <a
+            href="https://www.runoob.com/xpath/xpath-tutorial.html"
+            target="_blank"
+            class="resource-card"
+          >
+            <h4>🔧 菜鸟教程 XPath</h4>
+            <p>XPath 基础教程</p>
+          </a>
+
+          <a
+            href="https://css-tricks.com/almanac/selectors/"
+            target="_blank"
+            class="resource-card"
+          >
+            <h4>💡 CSS-Tricks</h4>
+            <p>CSS 技巧和示例（英文）</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- 快速参考 -->
+      <div class="card">
+        <h2>📋 快速参考卡片</h2>
+
+        <h3>CSS 选择器速查</h3>
+        <div class="code-block">
+          <div>/* 基础选择器 */</div>
+          <div>#id /* ID 选择器 */</div>
+          <div>.class /* 类选择器 */</div>
+          <div>element /* 标签选择器 */</div>
+          <div></div>
+          <div>/* 属性选择器 */</div>
+          <div>[attr] /* 有该属性 */</div>
+          <div>[attr="value"] /* 属性等于 */</div>
+          <div>[attr*="value"] /* 属性包含 */</div>
+          <div></div>
+          <div>/* 组合选择器 */</div>
+          <div>div.class /* div 且有 class */</div>
+          <div>div > p /* 直接子元素 */</div>
+          <div>div p /* 所有后代 */</div>
+        </div>
+
+        <h3>XPath 速查</h3>
+        <div class="code-block">
+          <div>/* 基础表达式 */</div>
+          <div>//*[@id="xxx"] /* 通过 ID */</div>
+          <div>//div[@class="xxx"] /* 通过 class */</div>
+          <div>//tag[contains(@attr, "x")] /* 属性包含 */</div>
+          <div></div>
+          <div>/* 常用函数 */</div>
+          <div>contains(@attr, "text") /* 包含文本 */</div>
+          <div>starts-with(@attr, "text") /* 以...开头 */</div>
+          <div>text()="xxx" /* 文本等于 */</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
