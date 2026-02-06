@@ -279,3 +279,11 @@ loadAndApplyRules();
 ## 📄 许可证
 
 本项目采用 [MIT License](LICENSE) 开源协议。
+
+---
+
+## 🤖 AI 提示
+
+此项目由 AI 辅助生成，请参考 AI 原始对话。
+
+- https://github.com/copilot/share/c02a528a-08e4-8855-a050-a84a20e2401c
