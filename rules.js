@@ -1,4 +1,5 @@
 let allRules = {};
+let editingRule = null;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,6 +29,35 @@ function bindEvents() {
   
   // 使用事件委托处理动态添加的按钮
   document.getElementById('rulesList').addEventListener('click', handleRuleListClick);
+  
+  // 模态框相关事件
+  const editModal = document.getElementById('editModal');
+  
+  // 模态框外部点击关闭
+  editModal.addEventListener('click', (e) => {
+    if (e.target.id === 'editModal') {
+      closeEditModal();
+    }
+  });
+  
+  // 关闭按钮
+  document.getElementById('modalCloseBtn').addEventListener('click', closeEditModal);
+  
+  // 取消按钮
+  document.getElementById('modalCancelBtn').addEventListener('click', closeEditModal);
+  
+  // 保存按钮
+  document.getElementById('modalSaveBtn').addEventListener('click', saveEditedRule);
+  
+  // ESC 键关闭模态框
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && editModal.classList.contains('show')) {
+      closeEditModal();
+    }
+  });
+  
+  // 选择器类型改变时更新提示
+  document.getElementById('editType').addEventListener('change', updateSelectorHelper);
 }
 
 // 处理规则列表中的点击事件（事件委托）
@@ -48,6 +78,15 @@ function handleRuleListClick(e) {
     const hostname = btn.dataset.hostname;
     const ruleId = btn.dataset.ruleId;
     toggleRule(hostname, ruleId);
+    return;
+  }
+  
+  // 编辑规则
+  if (target.classList.contains('edit-rule-btn') || target.closest('.edit-rule-btn')) {
+    const btn = target.classList.contains('edit-rule-btn') ? target : target.closest('.edit-rule-btn');
+    const hostname = btn.dataset.hostname;
+    const ruleId = btn.dataset.ruleId;
+    openEditModal(hostname, ruleId);
     return;
   }
   
@@ -159,10 +198,15 @@ function createRuleItem(hostname, rule) {
                 data-rule-id="${rule.id}">
           ${rule.enabled ? '✓ 启用' : '✗ 禁用'}
         </button>
+        <button class="rule-btn rule-btn-edit edit-rule-btn" 
+                data-hostname="${escapeHtml(hostname)}" 
+                data-rule-id="${rule.id}">
+          ✏️ 编辑
+        </button>
         <button class="rule-btn rule-btn-delete delete-rule-btn" 
                 data-hostname="${escapeHtml(hostname)}" 
                 data-rule-id="${rule.id}">
-          🗑️ 删除
+          🗑�� 删除
         </button>
       </div>
     </div>
@@ -186,6 +230,170 @@ function updateStats() {
   document.getElementById('totalSites').textContent = sites.length;
   document.getElementById('totalRules').textContent = totalRules;
   document.getElementById('activeRules').textContent = activeRules;
+}
+
+// 打开编辑模态框
+function openEditModal(hostname, ruleId) {
+  const rules = allRules[hostname];
+  if (!rules) return;
+  
+  const rule = rules.find(r => r.id === ruleId);
+  if (!rule) return;
+  
+  // 保存编辑信息
+  editingRule = {
+    hostname: hostname,
+    ruleId: ruleId,
+    originalRule: { ...rule }
+  };
+  
+  // 填充表单
+  document.getElementById('editType').value = rule.type;
+  document.getElementById('editSelector').value = rule.selector;
+  document.getElementById('editDescription').value = rule.description || '';
+  document.getElementById('editRemoveMode').checked = rule.removeMode || false;
+  document.getElementById('editEnabled').checked = rule.enabled;
+  
+  // 更新提示文字
+  updateSelectorHelper();
+  
+  // 清空验证消息
+  hideValidationMessage();
+  
+  // 显示模态框
+  document.getElementById('editModal').classList.add('show');
+}
+
+// 关闭编辑模态框
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('show');
+  editingRule = null;
+  
+  // 清空验证消息
+  hideValidationMessage();
+}
+
+// 保存编辑后的规则
+function saveEditedRule() {
+  if (!editingRule) return;
+  
+  const hostname = editingRule.hostname;
+  const ruleId = editingRule.ruleId;
+  
+  // 获取表单数据
+  const newType = document.getElementById('editType').value;
+  const newSelector = document.getElementById('editSelector').value.trim();
+  const newDescription = document.getElementById('editDescription').value.trim();
+  const newRemoveMode = document.getElementById('editRemoveMode').checked;
+  const newEnabled = document.getElementById('editEnabled').checked;
+  
+  // 验证选择器
+  if (!newSelector) {
+    showValidationMessage('请输入选择器', 'error');
+    return;
+  }
+  
+  // 基本语法验证
+  if (!validateSelectorSyntax(newSelector, newType)) {
+    showValidationMessage('选择器语法可能有误，请检查', 'error');
+    return;
+  }
+  
+  const rules = allRules[hostname];
+  if (!rules) return;
+  
+  const ruleIndex = rules.findIndex(r => r.id === ruleId);
+  if (ruleIndex === -1) return;
+  
+  // 检查是否与其他规则重复
+  const isDuplicate = rules.some((r, index) => 
+    index !== ruleIndex && 
+    r.selector === newSelector && 
+    r.type === newType
+  );
+  
+  if (isDuplicate) {
+    showValidationMessage('该选择器已存在于其他规则中', 'error');
+    return;
+  }
+  
+  // 更新规则
+  const updatedRule = {
+    ...rules[ruleIndex],
+    type: newType,
+    selector: newSelector,
+    description: newDescription || rules[ruleIndex].description,
+    removeMode: newRemoveMode,
+    enabled: newEnabled,
+    updatedAt: Date.now()
+  };
+  
+  rules[ruleIndex] = updatedRule;
+  allRules[hostname] = rules;
+  
+  // 保存到存储
+  saveRules(() => {
+    showToast('规则已更新', 'success');
+    closeEditModal();
+    loadRules();
+  });
+}
+
+// 验证选择器语法
+function validateSelectorSyntax(selector, type) {
+  try {
+    if (type === 'css') {
+      // CSS 选择器基本验证
+      if (!selector || selector.trim() === '') {
+        return false;
+      }
+      return true;
+    } else if (type === 'xpath') {
+      // XPath 基本验证
+      if (!selector.startsWith('/') && !selector.startsWith('(')) {
+        return false;
+      }
+      return true;
+    }
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+// 更新选择器提示
+function updateSelectorHelper() {
+  const type = document.getElementById('editType').value;
+  const helper = document.getElementById('editSelectorHelper');
+  
+  if (type === 'xpath') {
+    helper.innerHTML = `
+      <strong>XPath 示例:</strong><br>
+      //*[@id="aswift_3_host"]<br>
+      //div[@class="ad-container"]<br>
+      //iframe[contains(@src, 'doubleclick')]
+    `;
+  } else {
+    helper.innerHTML = `
+      <strong>CSS 示例:</strong><br>
+      #ad-banner<br>
+      .popup-overlay<br>
+      div[data-ad="true"]
+    `;
+  }
+}
+
+// 显示验证消息
+function showValidationMessage(message, type) {
+  const msg = document.getElementById('editValidationMessage');
+  msg.textContent = message;
+  msg.className = `validation-message ${type} show`;
+}
+
+// 隐藏验证消息
+function hideValidationMessage() {
+  const msg = document.getElementById('editValidationMessage');
+  msg.className = 'validation-message';
 }
 
 // 切换规则启用状态
@@ -239,7 +447,7 @@ function deleteSite(hostname) {
   delete allRules[hostname];
   saveRules(() => {
     loadRules();
-    showToast(`已删除 ${hostname} 的所有���则`, 'success');
+    showToast(`已删除 ${hostname} 的所有规则`, 'success');
   });
 }
 
@@ -273,7 +481,7 @@ function exportRules() {
   
   const a = document.createElement('a');
   a.href = url;
-  a.download = `element-remover-rules-${Date.now()}.json`;
+  a.download = `element-eraser-rules-${Date.now()}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -298,13 +506,11 @@ function importRules(event) {
       }
       
       if (confirm('导入规则将与现有规则合并。是否继续？')) {
-        // 合并规则
         for (const hostname in imported) {
           if (!allRules[hostname]) {
             allRules[hostname] = [];
           }
           
-          // 避免重复
           const existingSelectors = new Set(
             allRules[hostname].map(r => r.selector + r.type)
           );

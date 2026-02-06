@@ -121,6 +121,17 @@
       box-shadow: 0 4px 8px rgba(245, 101, 101, 0.3);
     }
     
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #38a169;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+    }
+    
     .selector-type {
       display: flex;
       gap: 8px;
@@ -173,11 +184,119 @@
       font-size: 11px;
       color: #868e96;
     }
+    
+    /* 新增：手动输入样式 */
+    .manual-input {
+      margin-bottom: 12px;
+    }
+    
+    .input-group {
+      margin-bottom: 10px;
+    }
+    
+    .input-label {
+      display: block;
+      font-size: 12px;
+      color: #495057;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+    
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    textarea {
+      min-height: 80px;
+    }
+    
+    .validation-status {
+      font-size: 11px;
+      margin-top: 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .validation-status.show {
+      display: block;
+    }
+    
+    .validation-status.valid {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .validation-status.invalid {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .validation-status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .button-group button {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .example-text {
+      font-size: 11px;
+      color: #868e96;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* 折叠面板 */
+    .collapsible {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .collapsible-icon {
+      transition: transform 0.3s;
+    }
+    
+    .collapsible-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    
+    .collapsible-content.expanded {
+      max-height: 500px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h3>🗑️ 网页元素删除器</h3>
+    <h3>🗑️ Element Eraser</h3>
     <div class="subtitle">快速隐藏网页上的任何元素</div>
   </div>
   
@@ -218,9 +337,57 @@
       </div>
     </div>
     
+    <!-- 手动添加规则 (新增) -->
+    <div class="section">
+      <div class="section-title collapsible" id="manualToggle">
+        <span>✍️ 手动添加规则</span>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      
+      <div class="collapsible-content" id="manualContent">
+        <div class="manual-input">
+          <div class="input-group">
+            <label class="input-label">
+              选择器 <span id="selectorTypeLabel">(CSS)</span>
+            </label>
+            <textarea 
+              id="manualSelector" 
+              placeholder="例如：#ad-banner&#10;.google-ads&#10;或：//*[@id='aswift_3_host']"
+              rows="3"
+            ></textarea>
+            <div class="example-text">
+              <strong>CSS 示例：</strong> #ad-banner, .popup-overlay, div.advertisement<br>
+              <strong>XPath 示例：</strong> //*[@id="aswift_3_host"], //div[@class="ad"]
+            </div>
+            <div id="validationStatus" class="validation-status"></div>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">规则描述（可选）</label>
+            <input 
+              type="text" 
+              id="manualDescription" 
+              placeholder="例如：移除顶部广告"
+            >
+          </div>
+          
+          <div class="button-group">
+            <button id="validateSelector" class="btn-outline">
+              <span>✓</span>
+              <span>验证</span>
+            </button>
+            <button id="addManualRule" class="btn-success">
+              <span>➕</span>
+              <span>添加规则</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- 主要操作 -->
     <div class="section">
-      <div class="section-title">🎯 主要操作</div>
+      <div class="section-title">🎯 点击选择</div>
       <button id="startPicker" class="btn-primary">
         <span>▶️</span>
         <span>开始选择元素</span>
@@ -258,8 +425,8 @@
       <ol style="margin: 8px 0 0 0; padding-left: 20px;">
         <li>选择CSS或XPath模式</li>
         <li>选择隐藏或删除模式</li>
-        <li>点击"开始选择元素"</li>
-        <li>在网页上点击要处理的元素</li>
+        <li><strong>手动添加</strong>：输入选择器直接添加规则</li>
+        <li><strong>点击选择</strong>：在网页上点击要处理的元素</li>
         <li>规则自动保存，刷新后依然生效</li>
         <li>按ESC键退出选择模式</li>
       </ol>
