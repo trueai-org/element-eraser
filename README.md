@@ -142,7 +142,7 @@
 ## 📸 截图
 
 ### 主界面
-![主界面](screenshots/popup.png)
+![主界面](screenshots/popup2.0.1.png)
 
 ### 规则管理
 ![规则管理](screenshots/rules.png)
