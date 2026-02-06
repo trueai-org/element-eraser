@@ -6,16 +6,14 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chrome.google.com/webstore)
-[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/yourusername/element-eraser)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/element-eraser/pulls)
+[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/trueai-org/element-eraser)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/trueai-org/element-eraser/pulls)
 
 **[English](#english) | [中文文档](#chinese)**
 
 一键删除网页上的任何元素 - 广告、弹窗、推荐内容，让网页更清爽！
 
 *One-click removal of any web elements - ads, pop-ups, recommendations, for a cleaner web!*
-
-[功能特性](#features) • [安装](#installation) • [使用指南](#usage) • [截图](#screenshots) • [开发](#development)
 
 </div>
 
