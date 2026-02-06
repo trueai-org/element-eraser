@@ -145,7 +145,7 @@
 ![主界面](screenshots/popup2.0.1.png)
 
 ### 规则管理
-![规则管理](screenshots/rules.png)
+![规则管理](screenshots/rules2.0.1.png)
 
 ---
 
