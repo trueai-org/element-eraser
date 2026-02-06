@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrome 插件图标生成器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .style-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .style-card {
+      border: 3px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .style-card:hover {
+      border-color: #667eea;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .style-card.active {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .style-preview {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+
+    .style-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .style-desc {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .preview-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 30px;
+    }
+
+    .preview-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .canvas-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .canvas-item {
+      text-align: center;
+    }
+
+    .canvas-wrapper {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+    }
+
+    canvas {
+      display: block;
+      border-radius: 8px;
+    }
+
+    .canvas-label {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .controls {
+      margin-bottom: 30px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .color-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .color-input-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="color"] {
+      width: 60px;
+      height: 40px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .range-value {
+      display: inline-block;
+      min-width: 40px;
+      text-align: center;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #f0f4ff;
+    }
+
+    .instructions {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+
+    .instructions h3 {
+      color: #856404;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: #856404;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Chrome 插件图标生成器</h1>
+    <p class="subtitle">为"网页元素删除器"生成专业图标</p>
+
+    <!-- 风格选择 -->
+    <div class="style-selector">
+      <div class="style-card active" data-style="trash">
+        <div class="style-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          🗑️
+        </div>
+        <div class="style-name">简洁风格</div>
+        <div class="style-desc">垃圾桶 + 渐变背景</div>
+      </div>
+
+      <div class="style-card" data-style="scissors">
+        <div class="style-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          ✂️
+        </div>
+        <div class="style-name">专业风格</div>
+        <div class="style-desc">剪刀 + 粉红渐变</div>
+      </div>
+
+      <div class="style-card" data-style="target">
+        <div class="style-preview" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          🎯
+        </div>
+        <div class="style-name">现代风格</div>
+        <div class="style-desc">靶心 + 蓝色渐变</div>
+      </div>
+    </div>
+
+    <!-- 颜色自定义 -->
+    <div class="controls">
+      <div class="control-group">
+        <label class="control-label">渐变颜色</label>
+        <div class="color-inputs">
+          <div class="color-input-group">
+            <input type="color" id="color1" value="#667eea">
+            <input type="text" id="color1Text" value="#667eea">
+            <span>起始色</span>
+          </div>
+          <div class="color-input-group">
+            <input type="color" id="color2" value="#764ba2">
+            <input type="text" id="color2Text" value="#764ba2">
+            <span>结束色</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          图标大小调整: <span class="range-value" id="scaleValue">85%</span>
+        </label>
+        <input type="range" id="iconScale" min="50" max="100" value="85">
+      </div>
+    </div>
+
+    <!-- 预览区域 -->
+    <div class="preview-section">
+      <div class="preview-title">图标预览</div>
+      <div class="canvas-container">
+        <div class="canvas-item">
+          <div class="canvas-wrapper">
+            <canvas id="canvas16" width="16" height="16"></canvas>
+          </div>
+          <div class="canvas-label">16 x 16 px</div>
+        </div>
+        <div class="canvas-item">
+          <div class="canvas-wrapper">
+            <canvas id="canvas48" width="48" height="48"></canvas>
+          </div>
+          <div class="canvas-label">48 x 48 px</div>
+        </div>
+        <div class="canvas-item">
+          <div class="canvas-wrapper">
+            <canvas id="canvas128" width="128" height="128"></canvas>
+          </div>
+          <div class="canvas-label">128 x 128 px</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 按钮 -->
+    <div class="button-group">
+      <button class="btn btn-primary" onclick="downloadAll()">
+        📥 下载全部图标
+      </button>
+      <button class="btn btn-secondary" onclick="updateIcons()">
+        🔄 重新生成
+      </button>
+    </div>
+
+    <!-- 使用说明 -->
+    <div class="instructions">
+      <h3>📝 使用说明</h3>
+      <ol>
+        <li>选择一个设计风格（点击卡片）</li>
+        <li>可以自定义渐变颜色</li>
+        <li>调整图标大小比例</li>
+        <li>点击"下载全部图标"保存</li>
+        <li>将下载的图标文件放到插件文件夹中</li>
+        <li>修改 manifest.json 添加 icons 配置（见下方）</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    let currentStyle = 'trash';
+    const styles = {
+      trash: { emoji: '🗑️', color1: '#667eea', color2: '#764ba2' },
+      scissors: { emoji: '✂️', color1: '#f093fb', color2: '#f5576c' },
+      target: { emoji: '🎯', color1: '#4facfe', color2: '#00f2fe' }
+    };
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      updateIcons();
+      bindEvents();
+    });
+
+    // 绑定事件
+    function bindEvents() {
+      // 风格选择
+      document.querySelectorAll('.style-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          currentStyle = card.dataset.style;
+          const style = styles[currentStyle];
+          document.getElementById('color1').value = style.color1;
+          document.getElementById('color2').value = style.color2;
+          document.getElementById('color1Text').value = style.color1;
+          document.getElementById('color2Text').value = style.color2;
+          updateIcons();
+        });
+      });
+
+      // 颜色选择器同步
+      document.getElementById('color1').addEventListener('input', (e) => {
+        document.getElementById('color1Text').value = e.target.value;
+        updateIcons();
+      });
+      document.getElementById('color2').addEventListener('input', (e) => {
+        document.getElementById('color2Text').value = e.target.value;
+        updateIcons();
+      });
+      document.getElementById('color1Text').addEventListener('input', (e) => {
+        document.getElementById('color1').value = e.target.value;
+        updateIcons();
+      });
+      document.getElementById('color2Text').addEventListener('input', (e) => {
+        document.getElementById('color2').value = e.target.value;
+        updateIcons();
+      });
+
+      // 大小调整
+      document.getElementById('iconScale').addEventListener('input', (e) => {
+        document.getElementById('scaleValue').textContent = e.target.value + '%';
+        updateIcons();
+      });
+    }
+
+    // 更新图标
+    function updateIcons() {
+      const color1 = document.getElementById('color1').value;
+      const color2 = document.getElementById('color2').value;
+      const scale = document.getElementById('iconScale').value / 100;
+      const emoji = styles[currentStyle].emoji;
+
+      drawIcon('canvas16', 16, emoji, color1, color2, scale);
+      drawIcon('canvas48', 48, emoji, color1, color2, scale);
+      drawIcon('canvas128', 128, emoji, color1, color2, scale);
+    }
+
+    // 绘制图标
+    function drawIcon(canvasId, size, emoji, color1, color2, scale) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+
+      // 清空画布
+      ctx.clearRect(0, 0, size, size);
+
+      // 绘制渐变背景
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+
+      // 圆角矩形背景
+      const radius = size * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // 绘制 emoji
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${size * 0.6 * scale}px Arial`;
+      ctx.fillText(emoji, size / 2, size / 2);
+    }
+
+    // 下载单个图标
+    function downloadCanvas(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // 下载全部
+    function downloadAll() {
+      setTimeout(() => downloadCanvas('canvas16', 'icon16.png'), 100);
+      setTimeout(() => downloadCanvas('canvas48', 'icon48.png'), 300);
+      setTimeout(() => downloadCanvas('canvas128', 'icon128.png'), 500);
+      
+      setTimeout(() => {
+        alert('✅ 图标已下载！\n\n请将文件重命名为：\n- icon16.png\n- icon48.png\n- icon128.png\n\n然后放到插件文件夹中，并更新 manifest.json');
+      }, 800);
+    }
+  </script>
+</body>
+</html>
