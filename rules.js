@@ -206,7 +206,7 @@ function createRuleItem(hostname, rule) {
         <button class="rule-btn rule-btn-delete delete-rule-btn" 
                 data-hostname="${escapeHtml(hostname)}" 
                 data-rule-id="${rule.id}">
-          🗑�� 删除
+          🗑️ 删除
         </button>
       </div>
     </div>
