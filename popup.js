@@ -213,7 +213,7 @@ async function validateManualSelector() {
       if (result.count > 0) {
         showValidationStatus(`✓ 有效！找到 ${result.count} 个匹配元素`, 'valid');
       } else {
-        showValidationStatus('✓ ��择器有效，但当前页面无匹配元素', 'info');
+        showValidationStatus('✓ 选择器有效，但当前页面无匹配元素', 'info');
       }
     } else {
       showValidationStatus(`✗ 无效选择器: ${result.error}`, 'invalid');
