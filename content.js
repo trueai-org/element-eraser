@@ -65,20 +65,39 @@ function safeStorageSet(data, callback) {
 // ============================================
 (function init() {
   if (!isExtensionValid()) {
-    console.warn('[元素删除器] 扩展上下文无效，停止初始化');
     return;
   }
 
-  console.log('[元素删除器] 初始化 - URL:', window.location.href);
+  // 静默检查当前站点是否有规则，无规则则不初始化
+  const hostname = window.location.hostname;
+  try {
+    chrome.storage.sync.get(['rules'], (result) => {
+      if (chrome.runtime.lastError) return;
+      const allRules = result.rules || {};
+      const siteRules = allRules[hostname] || [];
+      if (siteRules.length === 0) {
+        return;
+      }
 
-  // 立即应用规则
-  loadAndApplyRules();
+      if (!isExtensionValid()) {
+        console.warn('[元素删除器] 扩展上下文无效，停止初始化');
+        return;
+      }
 
-  // 启动DOM监听器
-  startMutationObserver();
+      console.log('[元素删除器] 初始化 - URL:', window.location.href);
 
-  // 定时重试（处理延迟加载的内容）
-  startRetryIntervals();
+      // 立即应用规则
+      loadAndApplyRules();
+
+      // 启动DOM监听器
+      startMutationObserver();
+
+      // 定时重试（处理延迟加载的内容）
+      startRetryIntervals();
+    });
+  } catch (e) {
+    // 扩展上下文失效，静默退出
+  }
 })();
 
 // ============================================
