@@ -102,7 +102,7 @@ function handleRuleListClick(e) {
 
 // 加载规则
 function loadRules() {
-  chrome.storage.sync.get(['rules'], (result) => {
+  chrome.storage.local.get(['rules'], (result) => {
     allRules = result.rules || {};
     displayRules();
     updateStats();
@@ -455,7 +455,7 @@ function deleteSite(hostname) {
 function clearAllRules() {
   if (!confirm('⚠️ 确定要清空所有规则吗？\n\n此操作不可恢复！')) return;
   
-  chrome.storage.sync.clear(() => {
+  chrome.storage.local.remove(['rules'], () => {
     allRules = {};
     loadRules();
     showToast('所有规则已清空', 'success');
@@ -464,7 +464,7 @@ function clearAllRules() {
 
 // 保存规则
 function saveRules(callback) {
-  chrome.storage.sync.set({ rules: allRules }, () => {
+  chrome.storage.local.set({ rules: allRules }, () => {
     if (chrome.runtime.lastError) {
       showToast('保存失败: ' + chrome.runtime.lastError.message, 'error');
     } else if (callback) {

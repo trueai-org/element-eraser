@@ -27,7 +27,7 @@ function safeStorageGet(keys, callback) {
   }
 
   try {
-    chrome.storage.sync.get(keys, (result) => {
+    chrome.storage.local.get(keys, (result) => {
       if (chrome.runtime.lastError) {
         console.error('[元素删除器] 存储读取失败:', chrome.runtime.lastError);
         return;
@@ -46,7 +46,7 @@ function safeStorageSet(data, callback) {
   }
 
   try {
-    chrome.storage.sync.set(data, () => {
+    chrome.storage.local.set(data, () => {
       if (chrome.runtime.lastError) {
         console.error('[元素删除器] 存储写入失败:', chrome.runtime.lastError);
         if (callback) callback(false);
@@ -71,7 +71,7 @@ function safeStorageSet(data, callback) {
   // 静默检查当前站点是否有规则，无规则则不初始化
   const hostname = window.location.hostname;
   try {
-    chrome.storage.sync.get(['rules'], (result) => {
+    chrome.storage.local.get(['rules'], (result) => {
       if (chrome.runtime.lastError) return;
       const allRules = result.rules || {};
       const siteRules = allRules[hostname] || [];

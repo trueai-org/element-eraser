@@ -225,12 +225,19 @@ element-eraser/
 
 ### 调试技巧
 
+
+
 ```javascript
+
+// 将规则存储从 chrome.storage.sync 切换为 chrome.storage.local：
+// chrome.storage.sync 单个 key 上限仅 8,192 字节，规则多了就报 kQuotaBytesPerItem quota exceeded
+// chrome.storage.local 单个 key 上限 5MB，总量 10MB，完全够用
+
 // 查看规则缓存
 console.log('[元素删除器] 规则缓存:', rulesCache);
 
 // 查看存储数据
-chrome.storage.sync.get(['rules'], (result) => {
+chrome.storage.local.get(['rules'], (result) => {
   console.log('存储的规则:', result.rules);
 });
 
@@ -266,7 +273,9 @@ loadAndApplyRules();
 **A:** 可以！使用"删除模式"可以彻底移除广告元素。
 
 ### Q: 规则会同步到其他设备吗？
-**A:** 使用 `chrome.storage.sync`，登录同一 Google 账号的设备会自动同步。
+
+**A:** 使用 `chrome.storage.local`，登录同一 Google 账号的设备会自动同步。
+`chrome.storage.sync` 切换到 local 后，规则不再跨设备同步。如果需要跨设备使用，可以通过"导出/导入"功能手动迁移。
 
 ### Q: 如何备份规则？
 **A:** 在规则管理页面点击"导出规则"，保存 JSON 文件。

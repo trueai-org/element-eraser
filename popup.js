@@ -121,7 +121,7 @@ function bindEvents() {
   document.getElementById('clearCurrentSite').addEventListener('click', async () => {
     const hostname = new URL(currentTab.url).hostname;
 
-    chrome.storage.sync.get(['rules'], (result) => {
+    chrome.storage.local.get(['rules'], (result) => {
       const allRules = result.rules || {};
       const siteRules = allRules[hostname] || [];
 
@@ -133,7 +133,7 @@ function bindEvents() {
       if (confirm(`⚠️ 确定要清除 ${hostname} 的所有规则吗？\n\n共 ${siteRules.length} 条规则将被删除。`)) {
         delete allRules[hostname];
 
-        chrome.storage.sync.set({ rules: allRules }, () => {
+        chrome.storage.local.set({ rules: allRules }, () => {
           showMessage(`已清除 ${siteRules.length} 条规则`, 'success');
           loadStats();
 
@@ -159,7 +159,7 @@ function bindEvents() {
   // 清除所有规则
   document.getElementById('clearAllRules').addEventListener('click', () => {
     if (confirm('⚠️ 确定要清除所有隐藏规则吗？\n\n此操作不可恢复！')) {
-      chrome.storage.sync.clear(() => {
+      chrome.storage.local.remove(['rules'], () => {
         showMessage('所有规则已清除');
         loadStats();
         setTimeout(() => {
@@ -251,7 +251,7 @@ async function addManualRule() {
   };
 
   // 保存规则
-  chrome.storage.sync.get(['rules'], (result) => {
+  chrome.storage.local.get(['rules'], (result) => {
     const allRules = result.rules || {};
     const siteRules = allRules[hostname] || [];
 
@@ -268,7 +268,7 @@ async function addManualRule() {
     siteRules.push(newRule);
     allRules[hostname] = siteRules;
 
-    chrome.storage.sync.set({ rules: allRules }, () => {
+    chrome.storage.local.set({ rules: allRules }, () => {
       if (chrome.runtime.lastError) {
         showValidationStatus('保存失败: ' + chrome.runtime.lastError.message, 'invalid');
         return;
@@ -329,7 +329,7 @@ function updateRemoveModeUI() {
 }
 
 function loadStats() {
-  chrome.storage.sync.get(['rules'], (result) => {
+  chrome.storage.local.get(['rules'], (result) => {
     const allRules = result.rules || {};
     const hostname = new URL(currentTab.url).hostname;
     const siteRules = allRules[hostname] || [];
